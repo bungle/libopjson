@@ -78,6 +78,7 @@ json_read(struct json_token *obj, struct json_iter* iter)
     if (!iter || !obj || !iter->src || !iter->len || iter->err) {
         *obj = TOKEN_NULL;
         iter->err = 1;
+        return;
     }
 
     *obj = TOKEN_NULL;
