@@ -1,5 +1,5 @@
 # Install
-BIN = json
+BIN = libopjson.so
 
 # Compiler
 CC = gcc
@@ -13,7 +13,7 @@ DFLAGS += -Wredundant-decls -Wnested-externs -Wmissing-include-dirs
 DFLAGS += -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wmissing-prototypes -Wconversion
 DFLAGS += -Wswitch-default -Wundef -Wno-unused -Wstrict-overflow=5 -Wsign-conversion
 DFLAGS += -Winit-self -Wstrict-aliasing -fsanitize=address -fno-omit-frame-pointer
-CFLAGS = -O3
+CFLAGS = -O3 -shared
 
 .PHONY: release
 release: $(BIN)
@@ -23,18 +23,16 @@ debug: CFLAGS = $(DFLAGS)
 debug: $(BIN)
 
 # Objects
-SRCS = json.c test.c
+SRCS = json.c
 OBJS = $(SRCS: .c = .o)
 
 # Build
 $(BIN): $(SRCS)
-	@mkdir -p bin
 	$(CC) $^ -fno-gcse -fno-crossjumping $(CFLAGS) -o $@
-	@mv -f $(BIN) bin/
 
 # Misc
 clean:
-	rm -f bin/$(BIN) $(OBJS)
+	rm -f $(BIN) $(OBJS)
 
 all:
 	release
