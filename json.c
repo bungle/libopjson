@@ -9,7 +9,6 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Woverride-init"
 
-static const struct json_iter ITER_NULL;
 static const struct json_token TOKEN_NULL;
 
 void
@@ -86,7 +85,7 @@ json_read(struct json_token *obj, struct json_iter* iter)
     if (!iter->go)
         iter->go = go_struct;
 
-    unsigned int len = iter->len;
+    unsigned long len = iter->len;
     const unsigned char *cur;
     int utf8_remain = 0;
     for (cur = iter->src; len; cur++, len--) {
@@ -195,7 +194,7 @@ l_yield:
     return;
 }
 
-double
+static double
 ipow(int base, unsigned exp)
 {
     long long res = 1;
@@ -262,7 +261,7 @@ json_num(double *num, const struct json_token *tok)
     struct json_token *write = &nums[INT];
     write->str = tok->str;
 
-    unsigned int len = tok->len;
+    unsigned long len = tok->len;
     const unsigned char *cur;
     for (cur = tok->str; len; cur++, len--) {
         goto *go_num[*cur];

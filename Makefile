@@ -12,7 +12,7 @@ DFLAGS += -Wstrict-prototypes -Wold-style-definition -Wconversion
 DFLAGS += -Wredundant-decls -Wnested-externs -Wmissing-include-dirs
 DFLAGS += -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wmissing-prototypes -Wconversion
 DFLAGS += -Wswitch-default -Wundef -Wno-unused -Wstrict-overflow=5 -Wsign-conversion
-DFLAGS += -Winit-self -Wstrict-aliasing -fsanitize=address -fno-omit-frame-pointer
+DFLAGS += -Winit-self -Wstrict-aliasing -fsanitize=address -fno-omit-frame-pointer -shared
 CFLAGS = -O3 -shared
 
 .PHONY: release
@@ -28,11 +28,11 @@ OBJS = $(SRCS: .c = .o)
 
 # Build
 $(BIN): $(SRCS)
-	$(CC) $^ -fno-gcse -fno-crossjumping $(CFLAGS) -o $@
+	$(CC) $^ -fno-gcse $(CFLAGS) -o $@
 
 # Misc
 clean:
-	rm -f $(BIN) $(OBJS)
+	rm -f $(BIN)
 
 all:
 	release
