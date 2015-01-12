@@ -1,12 +1,32 @@
-# JSON
+# libopjson
 
-This is a fork from @vurtun/json.
+This is a fork from @vurtun/json. This library is to be used with [`lua-resty-opjson`](https://github.com/bungle/lua-resty-opjson).
 
-# License
+## API
 
+```C
+struct json_token {
+    const unsigned char *str;
+    unsigned long len;
+    unsigned long children;
+};
+struct json_iter {
+    int depth;
+    int err;
+    const void **go;
+    const unsigned char *src;
+    unsigned long len;
+};
+void json_read(struct json_token*, struct json_iter*);
+void json_num(double *, const struct json_token*);
+```
+
+## License
+
+```
 The MIT License (MIT)
 
-Copyright (c) 2014 vurtun
+Copyright (c) 2015 vurtun, bungle
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -36,3 +56,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
