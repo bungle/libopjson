@@ -97,7 +97,7 @@ json_read(struct json_token *obj, struct json_iter* iter)
         iter->src = 0;
         iter->len = 0;
         if (obj->str)
-            obj->len = (unsigned int)((cur-1) - obj->str);
+            obj->len = (unsigned long)((cur-1) - obj->str);
         return;
     }
 
@@ -119,7 +119,7 @@ l_up:
 
 l_down:
     if (--iter->depth == 1) {
-        obj->len = (unsigned int)(cur - obj->str) + 1;
+        obj->len = (unsigned long)(cur - obj->str) + 1;
         goto l_yield;
     }
     goto l_loop;
@@ -135,7 +135,7 @@ l_qup:
 l_qdown:
     iter->go = go_struct;
     if (iter->depth == 1) {
-        obj->len = (unsigned int)(cur - obj->str) + 1;
+        obj->len = (unsigned long)(cur - obj->str) + 1;
         goto l_yield;
     }
     goto l_loop;
@@ -159,7 +159,7 @@ l_bare:
 l_unbare:
     iter->go = go_struct;
     if (iter->depth == 1) {
-        obj->len = (unsigned int)(cur - obj->str);
+        obj->len = (unsigned long)(cur - obj->str);
         iter->src = cur;
         iter->len = len;
         return;
@@ -213,9 +213,9 @@ stoi(struct json_token *tok)
     if (!tok->str || !tok->len)
         return 0;
     double n = 0;
-    unsigned int i = 0;
-    const unsigned int off = tok->str[0] == '-' || tok->str[0] == '+' ? 1 : 0;
-    const unsigned int neg = tok->str[0] == '-' ? 1 : 0;
+    unsigned long i = 0;
+    const unsigned long off = tok->str[0] == '-' || tok->str[0] == '+' ? 1 : 0;
+    const unsigned long neg = tok->str[0] == '-' ? 1 : 0;
     for (i = off; i < tok->len; i++) {
         if (tok->str[i] >= '0' && tok->str[i] <= '9')
             n = n * 10 + tok->str[i]  - '0';
@@ -230,7 +230,7 @@ stof(struct json_token *tok)
         return 0;
     double n = 0;
     double f = 0.1;
-    unsigned int i = 0;
+    unsigned long i = 0;
     for (i = 0; i < tok->len; i++) {
         if (tok->str[i] >= '0' && tok->str[i] <= '9') {
             n = n + (tok->str[i] - '0') * f;
@@ -267,7 +267,7 @@ json_num(double *num, const struct json_token *tok)
         goto *go_num[*cur];
         l_loop:;
     }
-    write->len = (unsigned int)(cur - write->str);
+    write->len = (unsigned long)(cur - write->str);
 
     const double i = stoi(&nums[INT]);
     const double f = stof(&nums[FLT]);
@@ -279,13 +279,13 @@ json_num(double *num, const struct json_token *tok)
     return;
 
 l_flt:
-    write->len = (unsigned int)(cur - write->str);
+    write->len = (unsigned long)(cur - write->str);
     write = &nums[FLT];
     write->str = cur + 1;
     goto l_loop;
 
 l_exp:
-    write->len = (unsigned int)(cur - write->str);
+    write->len = (unsigned long)(cur - write->str);
     write = &nums[EXP];
     write->str = cur + 1;
     goto l_loop;
