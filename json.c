@@ -11,9 +11,7 @@
 
 static const struct json_token TOKEN_NULL;
 
-void
-json_read(struct json_token *obj, struct json_iter* iter)
-{
+void json_read(struct json_token *obj, struct json_iter* iter) {
     static const void *go_struct[] = {
         [0 ... 255] = &&l_fail,
         ['\t']      = &&l_loop,
@@ -73,18 +71,14 @@ json_read(struct json_token *obj, struct json_iter* iter)
         ['t']       = &&l_unesc,
         ['u']       = &&l_unesc
     };
-
     if (!iter || !obj || !iter->src || !iter->len || iter->err) {
         *obj = TOKEN_NULL;
         iter->err = 1;
         return;
     }
-
     *obj = TOKEN_NULL;
     iter->err = 0;
-    if (!iter->go)
-        iter->go = go_struct;
-
+    if (!iter->go) iter->go = go_struct;
     unsigned long len = iter->len;
     const unsigned char *cur;
     int utf8_remain = 0;
@@ -92,46 +86,33 @@ json_read(struct json_token *obj, struct json_iter* iter)
         goto *iter->go[*cur];
         l_loop:;
     }
-
     if (!iter->depth) {
         iter->src = 0;
         iter->len = 0;
-        if (obj->str)
-            obj->len = (unsigned long)((cur-1) - obj->str);
+        if (obj->str) obj->len = (unsigned long)(cur - 1 - obj->str);
         return;
     }
-
 l_fail:
     iter->err = 1;
     return;
-
 l_sep:
-    if (iter->depth == 2)
-        obj->children--;
+    if (iter->depth == 2) obj->children--;
     goto l_loop;
-
 l_up:
-    if (iter->depth == 2)
-        obj->children++;
-    if (iter->depth++ == 1)
-        obj->str = cur;
+    if (iter->depth   == 2) obj->children++;
+    if (iter->depth++ == 1) obj->str = cur;
     goto l_loop;
-
 l_down:
     if (--iter->depth == 1) {
         obj->len = (unsigned long)(cur - obj->str) + 1;
         goto l_yield;
     }
     goto l_loop;
-
 l_qup:
     iter->go = go_string;
-    if (iter->depth == 1)
-        obj->str = cur;
-    if (iter->depth == 2)
-        obj->children++;
+    if (iter->depth == 1) obj->str = cur;
+    if (iter->depth == 2) obj->children++;
     goto l_loop;
-
 l_qdown:
     iter->go = go_struct;
     if (iter->depth == 1) {
@@ -139,23 +120,17 @@ l_qdown:
         goto l_yield;
     }
     goto l_loop;
-
 l_esc:
     iter->go = go_esc;
     goto l_loop;
-
 l_unesc:
     iter->go = go_string;
     goto l_loop;
-
 l_bare:
-    if (iter->depth == 1)
-        obj->str = cur;
-    if (iter->depth == 2)
-        obj->children++;
+    if (iter->depth == 1) obj->str = cur;
+    if (iter->depth == 2) obj->children++;
     iter->go = go_bare;
     goto l_loop;
-
 l_unbare:
     iter->go = go_struct;
     if (iter->depth == 1) {
@@ -165,69 +140,47 @@ l_unbare:
         return;
     }
     goto *iter->go[*cur];
-
 l_utf8_2:
     iter->go = go_utf8;
     utf8_remain = 1;
     goto l_loop;
-
 l_utf8_3:
     iter->go = go_utf8;
     utf8_remain = 2;
     goto l_loop;
-
 l_utf8_4:
     iter->go = go_utf8;
     utf8_remain = 3;
     goto l_loop;
-
 l_utf_next:
-    if (!--utf8_remain)
-        iter->go = go_string;
+    if (!--utf8_remain) iter->go = go_string;
     goto l_loop;
-
 l_yield:
-    if (iter->depth != 1 || !obj->str)
-        goto l_loop;
+    if (iter->depth != 1 || !obj->str) goto l_loop;
     iter->src = cur + 1;
     iter->len = len - 1;
     return;
 }
-
-static double
-ipow(int base, unsigned exp)
-{
+static double ipow(int base, unsigned exp) {
     long long res = 1;
     while (exp) {
-        if (exp & 1)
-            res *= base;
+        if (exp & 1) res *= base;
         exp >>= 1;
         base *= base;
     }
     return (double)res;
 }
-
-static double
-stoi(struct json_token *tok)
-{
-    if (!tok->str || !tok->len)
-        return 0;
+static double stoi(struct json_token *tok) {
+    if (!tok->str || !tok->len) return 0;
     double n = 0;
     unsigned long i = 0;
     const unsigned long off = tok->str[0] == '-' || tok->str[0] == '+' ? 1 : 0;
     const unsigned long neg = tok->str[0] == '-' ? 1 : 0;
-    for (i = off; i < tok->len; i++) {
-        if (tok->str[i] >= '0' && tok->str[i] <= '9')
-            n = n * 10 + tok->str[i]  - '0';
-    }
+    for (i = off; i < tok->len; i++) if (tok->str[i] >= '0' && tok->str[i] <= '9') n = n * 10 + tok->str[i]  - '0';
     return neg ? -n : n;
 }
-
-static double
-stof(struct json_token *tok)
-{
-    if (!tok->str || !tok->len)
-        return 0;
+static double stof(struct json_token *tok) {
+    if (!tok->str || !tok->len) return 0;
     double n = 0;
     double f = 0.1;
     unsigned long i = 0;
@@ -239,10 +192,7 @@ stof(struct json_token *tok)
     }
     return n;
 }
-
-void
-json_num(double *num, const struct json_token *tok)
-{
+void json_num(double *num, const struct json_token *tok) {
     static const void **go_num[] = {
         [0 ... 255] = &&l_fail,
         [48 ... 57] = &&l_loop,
@@ -260,7 +210,6 @@ json_num(double *num, const struct json_token *tok)
     struct json_token nums[TOKS] = {{0}};
     struct json_token *write = &nums[INT];
     write->str = tok->str;
-
     unsigned long len = tok->len;
     const unsigned char *cur;
     for (cur = tok->str; len; cur++, len--) {
@@ -268,34 +217,28 @@ json_num(double *num, const struct json_token *tok)
         l_loop:;
     }
     write->len = (unsigned long)(cur - write->str);
-
     const double i = stoi(&nums[INT]);
     const double f = stof(&nums[FLT]);
     const double e = stoi(&nums[EXP]);
     double p = ipow(10, (unsigned)(e < 0 ? -e : e));
-    if (e < 0)
-        p = (1 / p);
-    *num = (i + ((i < 0) ? -f : f)) * p;
+    if (e < 0) p = 1 / p;
+    *num = (i + (i < 0 ? -f : f)) * p;
     return;
-
 l_flt:
     write->len = (unsigned long)(cur - write->str);
     write = &nums[FLT];
     write->str = cur + 1;
     goto l_loop;
-
 l_exp:
     write->len = (unsigned long)(cur - write->str);
     write = &nums[EXP];
     write->str = cur + 1;
     goto l_loop;
-
 l_break:
     len = 1;
     goto l_loop;
 l_fail:
     return;
 }
-
 
 #pragma GCC diagnostic pop
