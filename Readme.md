@@ -1,6 +1,7 @@
 # libopjson
 
-This is a fork from @vurtun/json. This library is to be used with [`lua-resty-opjson`](https://github.com/bungle/lua-resty-opjson).
+This is a fork from [@vurtun/json](https://github.com/vurtun/json). This library is to be used with
+[`lua-resty-opjson`](https://github.com/bungle/lua-resty-opjson).
 
 ## API
 
