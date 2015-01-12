@@ -214,13 +214,13 @@ stoi(struct json_token *tok)
         return 0;
     double n = 0;
     unsigned int i = 0;
-    const unsigned int off = (tok->str[0] == '-' || tok->str[0] == '+') ? 1 : 0;
-    const unsigned int neg = (tok->str[0] == '-') ? 1 : 0;
+    const unsigned int off = tok->str[0] == '-' || tok->str[0] == '+' ? 1 : 0;
+    const unsigned int neg = tok->str[0] == '-' ? 1 : 0;
     for (i = off; i < tok->len; i++) {
-        if ((tok->str[i] >= '0') && (tok->str[i] <= '9'))
-            n = (n * 10) + tok->str[i]  - '0';
+        if (tok->str[i] >= '0' && tok->str[i] <= '9')
+            n = n * 10 + tok->str[i]  - '0';
     }
-    return (neg) ? -n : n;
+    return neg ? -n : n;
 }
 
 static double
@@ -232,7 +232,7 @@ stof(struct json_token *tok)
     double f = 0.1;
     unsigned int i = 0;
     for (i = 0; i < tok->len; i++) {
-        if ((tok->str[i] >= '0') && (tok->str[i] <= '9')) {
+        if (tok->str[i] >= '0' && tok->str[i] <= '9') {
             n = n + (tok->str[i] - '0') * f;
             f *= 0.1;
         }
@@ -272,7 +272,7 @@ json_num(double *num, const struct json_token *tok)
     const double i = stoi(&nums[INT]);
     const double f = stof(&nums[FLT]);
     const double e = stoi(&nums[EXP]);
-    double p = ipow(10, (unsigned)((e < 0) ? -e : e));
+    double p = ipow(10, (unsigned)(e < 0 ? -e : e));
     if (e < 0)
         p = (1 / p);
     *num = (i + ((i < 0) ? -f : f)) * p;
