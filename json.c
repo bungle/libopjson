@@ -11,7 +11,7 @@
 
 static const struct json_token TOKEN_NULL;
 
-void json_read(struct json_token *obj, struct json_iter* iter) {
+int json_read(struct json_token *obj, struct json_iter* iter) {
     static const void *go_struct[] = {
         [0 ... 255] = &&l_fail,
         ['\t']      = &&l_loop,
@@ -71,13 +71,11 @@ void json_read(struct json_token *obj, struct json_iter* iter) {
         ['t']       = &&l_unesc,
         ['u']       = &&l_unesc
     };
-    if (!iter || !obj || !iter->src || !iter->len || iter->err) {
+    if (!iter || !obj || !iter->src || !iter->len) {
         *obj = TOKEN_NULL;
-        iter->err = 1;
-        return;
+        return -1;
     }
     *obj = TOKEN_NULL;
-    iter->err = 0;
     if (!iter->go) iter->go = go_struct;
     unsigned long len = iter->len;
     const unsigned char *cur;
@@ -90,11 +88,10 @@ void json_read(struct json_token *obj, struct json_iter* iter) {
         iter->src = 0;
         iter->len = 0;
         if (obj->str) obj->len = (unsigned long)(cur - 1 - obj->str);
-        return;
+        return 0;
     }
 l_fail:
-    iter->err = 1;
-    return;
+    return -1;
 l_sep:
     if (iter->depth == 2) obj->children--;
     goto l_loop;
@@ -137,7 +134,7 @@ l_unbare:
         obj->len = (unsigned long)(cur - obj->str);
         iter->src = cur;
         iter->len = len;
-        return;
+        return 0;
     }
     goto *iter->go[*cur];
 l_utf8_2:
@@ -159,7 +156,7 @@ l_yield:
     if (iter->depth != 1 || !obj->str) goto l_loop;
     iter->src = cur + 1;
     iter->len = len - 1;
-    return;
+    return 0;
 }
 static double ipow(int base, unsigned exp) {
     long long res = 1;

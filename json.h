@@ -13,12 +13,11 @@ struct json_token {
 };
 struct json_iter {
     int depth;
-    int err;
     const void **go;
     const unsigned char *src;
     unsigned long len;
 };
-void json_read(struct json_token*, struct json_iter*);
+int json_read(struct json_token*, struct json_iter*);
 int json_num(double *, const struct json_token*);
 
 #endif
