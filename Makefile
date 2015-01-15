@@ -28,7 +28,7 @@ OBJS = $(SRCS: .c = .o)
 
 # Build
 $(BIN): $(SRCS)
-	$(CC) $^ -fno-gcse $(CFLAGS) -o $@
+	$(CC) $^ -fno-gcse -fno-crossjumping $(CFLAGS) -o $@
 
 # Misc
 clean:
