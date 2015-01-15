@@ -192,7 +192,7 @@ static double stof(struct json_token *tok) {
     }
     return n;
 }
-void json_num(double *num, const struct json_token *tok) {
+int json_num(double *num, const struct json_token *tok) {
     static const void **go_num[] = {
         [0 ... 255] = &&l_fail,
         [48 ... 57] = &&l_loop,
@@ -206,6 +206,7 @@ void json_num(double *num, const struct json_token *tok) {
         ['\t'] = &&l_break,
         ['\r'] = &&l_break,
     };
+    if (!num || !tok || !tok->str || !tok->len) return -1;
     enum {INT, FLT, EXP, TOKS};
     struct json_token nums[TOKS] = {{0}};
     struct json_token *write = &nums[INT];
@@ -223,7 +224,7 @@ void json_num(double *num, const struct json_token *tok) {
     double p = ipow(10, (unsigned)(e < 0 ? -e : e));
     if (e < 0) p = 1 / p;
     *num = (i + (i < 0 ? -f : f)) * p;
-    return;
+    return 0;
 l_flt:
     write->len = (unsigned long)(cur - write->str);
     write = &nums[FLT];
@@ -238,7 +239,7 @@ l_break:
     len = 1;
     goto l_loop;
 l_fail:
-    return;
+    return -1;
 }
 
 #pragma GCC diagnostic pop
