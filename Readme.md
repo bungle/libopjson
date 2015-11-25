@@ -1,6 +1,6 @@
 # libopjson
 
-This is a fork from [@vurtun/zange](https://github.com/vurtun/zange). This library is to be used with
+This is a fork from [@deepinit-arek/json](https://github.com/deepinit-arek/json). This library is to be used with
 [lua-resty-opjson](https://github.com/bungle/lua-resty-opjson).
 
 ## API
